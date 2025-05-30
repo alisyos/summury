@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, FileText, Download, Loader2, CheckCircle, ArrowRight, Settings } from 'lucide-react';
+import { Upload, FileText, Download, Loader2, ArrowRight, Settings } from 'lucide-react';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -229,7 +229,7 @@ export default function Home() {
                       name="inputMethod"
                       value="file"
                       checked={inputMethod === 'file'}
-                      onChange={(e) => {
+                      onChange={() => {
                         setInputMethod('file');
                         setTextInput('');
                       }}
@@ -243,7 +243,7 @@ export default function Home() {
                       name="inputMethod"
                       value="text"
                       checked={inputMethod === 'text'}
-                      onChange={(e) => {
+                      onChange={() => {
                         setInputMethod('text');
                         setFile(null);
                       }}
@@ -300,7 +300,7 @@ export default function Home() {
 
                 <button
                   onClick={handleInitialAnalysis}
-                  disabled={isProcessing || (inputMethod === 'file' ? !file : !textInput.trim()) || currentStep !== 'upload'}
+                  disabled={isProcessing || (inputMethod === 'file' ? !file : !textInput.trim()) || (currentStep as string) !== 'upload'}
                   className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                 >
                   {currentStep === 'analyze' ? (
@@ -361,7 +361,7 @@ export default function Home() {
                         ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
-                    disabled={currentStep === 'upload' || currentStep === 'analyze'}
+                    disabled={(currentStep as string) === 'upload' || (currentStep as string) === 'analyze'}
                   >
                     요약 방법 선택
                   </button>

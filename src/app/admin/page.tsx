@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Save, RefreshCw, Settings, FileText, MessageSquare } from 'lucide-react';
 
 interface Prompt {
@@ -97,7 +98,7 @@ export default function AdminPage() {
   // 초기 로드
   useEffect(() => {
     loadPrompts();
-  }, []);
+  }, [loadPrompts]);
 
   if (isLoading) {
     return (
@@ -128,13 +129,13 @@ export default function AdminPage() {
               </div>
             </div>
             <div>
-              <a
+              <Link
                 href="/"
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm flex items-center"
               >
                 <FileText className="h-4 w-4 mr-2" />
                 메인으로
-              </a>
+              </Link>
             </div>
           </div>
         </div>

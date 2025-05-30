@@ -16,7 +16,7 @@ function readPrompts() {
 }
 
 // 프롬프트 파일 쓰기
-function writePrompts(prompts: any) {
+function writePrompts(prompts: Record<string, any>) {
   try {
     fs.writeFileSync(PROMPTS_FILE, JSON.stringify(prompts, null, 2), 'utf8');
     return true;
