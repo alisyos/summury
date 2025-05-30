@@ -2,10 +2,51 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
+import fs from 'fs';
+import path from 'path';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy-key-for-build',
 });
+
+// 프롬프트 파일에서 프롬프트 읽기
+function getPrompt(type: string): string {
+  try {
+    const promptsFile = path.join(process.cwd(), 'prompts.json');
+    const data = fs.readFileSync(promptsFile, 'utf8');
+    const prompts = JSON.parse(data);
+    return prompts[type]?.content || '';
+  } catch (error) {
+    console.error('프롬프트 읽기 오류:', error);
+    // 기본 프롬프트 반환
+    return `당신은 전문 문서 분석 및 요약 전문가입니다. 사용자가 제공한 문서를 읽고, 아래의 작업을 수행하세요:
+
+1. 해당 문서가 어떤 종류의 문서인지 판단하세요. 예: 업무 보고서, 논문, 회의록, 설명서, 기획안 등
+2. 문서의 주요 목적과 핵심 내용을 파악하세요.
+3. 서로 다른 관점이나 스타일로 3가지 요약 방법/방향성을 제안하세요:
+   - 요약안 1: 핵심 주제와 목적을 중심으로 한 간결한 요약 방법 (어떤 부분에 집중할지, 어떤 형태로 요약할지 설명)
+   - 요약안 2: 전체 흐름과 주요 논점을 포함하는 설명 중심 요약 방법 (구조적 접근법과 포함할 요소들 설명)
+   - 요약안 3: 독자의 이해를 돕기 위한 요점 나열식 요약 방법 (bullet point나 구조화된 형식의 접근법 설명)
+
+각 요약안은 "어떻게 요약할 것인가"에 대한 방법론이어야 하며, 실제 요약 내용이 아닌 요약 접근 방식을 제시해야 합니다.
+
+예시:
+- "문서의 핵심 결론과 주요 근거 3가지를 중심으로 간결하게 요약"
+- "문서의 배경, 현황 분석, 제안사항 순서로 구조화하여 상세히 요약"
+- "주요 포인트를 5개 항목으로 나누어 bullet point 형식으로 요약"
+
+응답은 다음 JSON 형식으로 제공해주세요:
+{
+  "documentType": "문서 유형",
+  "summaryOptions": ["요약 방법 1", "요약 방법 2", "요약 방법 3"]
+}
+
+문서:
+"""
+{{DOCUMENT_TEXT}}
+"""`;
+  }
+}
 
 async function extractTextFromFile(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -64,32 +105,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `당신은 전문 문서 분석 및 요약 전문가입니다. 사용자가 제공한 문서를 읽고, 아래의 작업을 수행하세요:
-
-1. 해당 문서가 어떤 종류의 문서인지 판단하세요. 예: 업무 보고서, 논문, 회의록, 설명서, 기획안 등
-2. 문서의 주요 목적과 핵심 내용을 파악하세요.
-3. 서로 다른 관점이나 스타일로 3가지 요약 방법/방향성을 제안하세요:
-   - 요약안 1: 핵심 주제와 목적을 중심으로 한 간결한 요약 방법 (어떤 부분에 집중할지, 어떤 형태로 요약할지 설명)
-   - 요약안 2: 전체 흐름과 주요 논점을 포함하는 설명 중심 요약 방법 (구조적 접근법과 포함할 요소들 설명)
-   - 요약안 3: 독자의 이해를 돕기 위한 요점 나열식 요약 방법 (bullet point나 구조화된 형식의 접근법 설명)
-
-각 요약안은 "어떻게 요약할 것인가"에 대한 방법론이어야 하며, 실제 요약 내용이 아닌 요약 접근 방식을 제시해야 합니다.
-
-예시:
-- "문서의 핵심 결론과 주요 근거 3가지를 중심으로 간결하게 요약"
-- "문서의 배경, 현황 분석, 제안사항 순서로 구조화하여 상세히 요약"
-- "주요 포인트를 5개 항목으로 나누어 bullet point 형식으로 요약"
-
-응답은 다음 JSON 형식으로 제공해주세요:
-{
-  "documentType": "문서 유형",
-  "summaryOptions": ["요약 방법 1", "요약 방법 2", "요약 방법 3"]
-}
-
-문서:
-"""
-${documentText}
-"""`;
+    const prompt = getPrompt('analyze').replace('{{DOCUMENT_TEXT}}', documentText);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4.1",

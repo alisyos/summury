@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, FileText, Download, Loader2, CheckCircle, ArrowRight } from 'lucide-react';
+import { Upload, FileText, Download, Loader2, CheckCircle, ArrowRight, Settings } from 'lucide-react';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -187,13 +187,24 @@ export default function Home() {
       {/* 헤더 */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              AI 문서 요약 서비스
-            </h1>
-            <p className="text-gray-600">
-              AI가 당신의 문서를 분석하고 완벽한 요약을 제공합니다
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="text-center flex-1">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                AI 문서 요약 서비스
+              </h1>
+              <p className="text-gray-600">
+                AI가 당신의 문서를 분석하고 완벽한 요약을 제공합니다
+              </p>
+            </div>
+            <div>
+              <a
+                href="/admin"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm flex items-center"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                관리자
+              </a>
+            </div>
           </div>
         </div>
       </div>
