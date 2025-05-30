@@ -115,15 +115,26 @@ export default function AdminPage() {
       {/* 헤더 */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center">
-            <Settings className="h-8 w-8 text-blue-500 mr-3" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Settings className="h-8 w-8 text-blue-500 mr-3" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800">
+                  프롬프트 관리자
+                </h1>
+                <p className="text-gray-600">
+                  AI 요약 서비스의 시스템 프롬프트를 관리합니다
+                </p>
+              </div>
+            </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                프롬프트 관리자
-              </h1>
-              <p className="text-gray-600">
-                AI 요약 서비스의 시스템 프롬프트를 관리합니다
-              </p>
+              <a
+                href="/"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm flex items-center"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                메인으로
+              </a>
             </div>
           </div>
         </div>
