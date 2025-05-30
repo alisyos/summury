@@ -98,7 +98,7 @@ export default function AdminPage() {
   // 초기 로드
   useEffect(() => {
     loadPrompts();
-  }, [loadPrompts]);
+  }, []);
 
   if (isLoading) {
     return (
