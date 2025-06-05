@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Upload, FileText, Download, Loader2, ArrowRight, Settings } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -184,6 +185,29 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* 진행 중 상태 오버레이 */}
+      {(currentStep === 'analyze' || currentStep === 'generate') && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
+        >
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4">
+            <div className="text-center">
+              <Loader2 className="mx-auto h-16 w-16 text-blue-500 animate-spin mb-6" />
+              <h3 className="text-xl font-medium mb-3">
+                {currentStep === 'analyze' ? '문서를 분석하고 있습니다...' : '최종 요약을 생성하고 있습니다...'}
+              </h3>
+              <p className="text-gray-600">
+                {currentStep === 'analyze' 
+                  ? 'AI가 문서의 유형을 분석하고 요약 방법을 제안하고 있습니다.' 
+                  : '선택하신 방법에 따라 완성도 높은 요약을 생성하고 있습니다.'
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
@@ -462,8 +486,25 @@ export default function Home() {
                   <div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                       <h3 className="font-medium mb-3 text-sm">최종 요약</h3>
-                      <div className="prose max-w-none">
-                        <p className="whitespace-pre-wrap text-gray-700 text-sm leading-relaxed">{finalSummary}</p>
+                      <div className="prose prose-sm max-w-none text-gray-700">
+                        <ReactMarkdown
+                          components={{
+                            h2: ({ children }) => <h2 className="text-2xl font-bold mt-4 mb-2 text-blue-800 text-center">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-lg font-semibold mt-6 mb-2 text-blue-600 text-left">{children}</h3>,
+                            p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+                            ul: ({ children }) => <ul className="mb-2 pl-4 text-gray-900 text-base text-left">{children}</ul>,
+                            ol: ({ children }) => <ol className="mb-2 pl-4 text-gray-900 text-base text-left">{children}</ol>,
+                            li: ({ children }) => <li className="mb-2 text-left">{children}</li>,
+                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                            blockquote: ({ children }) => (
+                              <blockquote className="border-l-4 border-blue-200 pl-4 italic text-gray-600 my-2">
+                                {children}
+                              </blockquote>
+                            ),
+                          }}
+                        >
+                          {finalSummary}
+                        </ReactMarkdown>
                       </div>
                     </div>
 
@@ -486,24 +527,7 @@ export default function Home() {
                 )}
               </div>
             )}
-            
-            {/* 진행 중 상태 표시 */}
-            {(currentStep === 'analyze' || currentStep === 'generate') && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="text-center">
-                  <Loader2 className="mx-auto h-12 w-12 text-blue-500 animate-spin mb-4" />
-                  <h3 className="text-lg font-medium mb-2">
-                    {currentStep === 'analyze' ? '문서를 분석하고 있습니다...' : '최종 요약을 생성하고 있습니다...'}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {currentStep === 'analyze' 
-                      ? 'AI가 문서의 유형을 분석하고 요약 방법을 제안하고 있습니다.' 
-                      : '선택하신 방법에 따라 완성도 높은 요약을 생성하고 있습니다.'
-                    }
-                  </p>
-                </div>
-              </div>
-            )}
+
 
             {/* 대기 상태 */}
             {currentStep === 'upload' && (
